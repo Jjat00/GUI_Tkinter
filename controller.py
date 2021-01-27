@@ -3,12 +3,28 @@ import os
 import matplotlib.pyplot as plt
 
 class Controller():
+    """
+    Lógica para la interfaz de usuario
+    """
     def __init__(self):
         super().__init__()
-        #self.pathDirectorio = os.getcwd() + '/demanda_col'
-        #self.pathDirectorio = pathArchivos#os.getcwd() + '/demanda_col'
 
     def cargarNombreArchivos(self, pathArchivos):
+        """
+        Dado la ruta del directorio retorna los nombres de todos los archivos .csv
+
+        paremeters: 
+            pathArchivos: String
+            string de la ruta del directorio
+
+        return:  
+            pathArchivos: string
+            ruta del directorio
+
+            nombreArchivos: lista de string
+            lista con los nombres de los archivos ubicados en el directorio
+        """
+
         listaArchivos = os.listdir(pathArchivos)
         listaArchivos.sort()  # ordenar la lista de los archivos
         nombreArchivos = []
@@ -18,6 +34,21 @@ class Controller():
         return (pathArchivos, nombreArchivos)
 
     def procesarDatos(self, file):
+        """
+        dado un archivo .csv extrae la fecha y los valores de la demanda del mes
+
+        parameters: 
+            file: File
+            archivo .csv abierto
+
+        return:
+            fechas: lista 
+            lista de todas las fechas
+
+            valoresDemanda: lista de float
+            lista de todos los valores de la demanda
+        """
+
         fechas = []
         valoresDemanda = []
         for datos in file:
@@ -37,6 +68,23 @@ class Controller():
         return fechas, valoresDemanda
 
     def cargarDatosDirectorio(self, pathDirectorio, nombreArchivos):
+        """
+        Dado la ruta del directorio y los nombres de los archivos retorna 
+        una lista con los datos de cada mes
+
+        parameters: 
+            pathDirectorio: String
+            string de la ruta del directorio donde se cuentran los archivos
+
+            nombreArchivos: lista de string
+            lista con los nombres de los archivos
+
+        return:
+            listaDatos: lista de diccionarios
+            lista de diccionarios con los datos de cada mes 
+
+        """
+
         listaDatos = []
         datosCompletos = {}
         for nombre in nombreArchivos:
@@ -54,6 +102,18 @@ class Controller():
         return listaDatos
 
     def cargarDatosArchivo(self, pathArchivo):
+        """
+        Carga los datos a partir de la ruta de un archivo .csv seleccionado
+
+        parameters: 
+            pathArchivo: String
+            string de la ruta del archivo
+
+        return:
+            datosCompletos: diccionario
+            diccionario con los datos del mes selecciondo
+        """
+
         datosCompletos = {}
         file = open(pathArchivo)
         # leer primera linea de encabezado
@@ -68,6 +128,25 @@ class Controller():
         return datosCompletos
 
     def encontrarDemandaMaxima(self, datos):
+        """
+        Encuentra el mes en donde hubo la máxima demanda entre todos los archivos
+
+        parameters: 
+            datos: lista de diccionarios
+            lista de diccionarios con la información de todos los meses
+
+        return:
+            nombreArchivo: string
+            string con el nombre del archivo en donde se encuentra la máxima demanda
+
+            fechaMaxValor: date
+            fecha en donde se encuentra la máxima demanda            
+
+            maxValor: float
+            float del máximo valor encontrado
+
+        """
+
         maximosValores = []
         fechaMaxValor = None
         maxValor = None
@@ -86,6 +165,18 @@ class Controller():
         return (nombreArchivo, fechaMaxValor, maxValor)
 
     def graficarMaximaDemanda(self, pathArchivos):
+        """
+        gráfica el mes con la máxima demanda encontrada
+
+        parameters: 
+            pathArchivos: String
+            string con la ruta en donde se encuentran los archivos
+
+        return:
+            fig: figura matplotlib
+            figura matplotlib del mes de la máxima demanda
+        """
+
         pathDirectorio, nombreArchivos = self.cargarNombreArchivos(pathArchivos)
         datos = self.cargarDatosDirectorio(pathDirectorio, nombreArchivos)
         nombreArchivo, fechaMaxValor, maxValor = self.encontrarDemandaMaxima(datos)
@@ -104,11 +195,36 @@ class Controller():
         return fig
 
     def cargarArchivo(self, pathArchivo):
+        """
+        carga los datos a partir de un archivo .csv
+
+        parameters: 
+            pathArchivo: string
+            string de la ruta en donde se encuentra el archivo
+        """
         self.datosArchivo = self.cargarDatosArchivo(pathArchivo)
         valoresDemanda = self.datosArchivo['valorDemanda']
         diasMes = int(len(valoresDemanda) / 24)
 
     def setIntervalo(self, min, max):
+        """
+        retorna la figura dado un intervalo de dias
+
+        parameters: 
+            min: int
+            entero donde empieza el intervalo de dias
+
+            max: int
+            entero donde finaliza el intervalo de dias
+
+        return:
+            fig: figura matplotlib
+            figura con el intervalo de dias dado
+
+            nombreArchivo: string
+            string del nombre del archivo que se seleccionó
+        """
+
         self.nuevasFechas = self.datosArchivo['fecha'][min * 24 : max * 24]
         self.nuevosDatos = self.datosArchivo['valorDemanda'][min * 24 : max * 24]
         nombreArchivo = 'mes_%i_dia_%i_al%i.txt' % (
@@ -120,8 +236,16 @@ class Controller():
         fig.add_subplot().set_title(self.datosArchivo['nombreArchivo'])
         return fig, nombreArchivo
 
-    def guardarNuevosDatos(self, pathArchuivo):
-        file = open(pathArchuivo, "w")
+    def guardarNuevosDatos(self, pathArchivo):
+        """
+        Guarda los datos del intervalo que se seleccinó
+
+        parameters: 
+            pathArchivo: String 
+            string de la ruta del archivo
+        """
+        
+        file = open(pathArchivo, "w")
         lines = []
         for index in range(len(self.nuevosDatos)):
             line =  str(self.nuevasFechas[index]) + ';' + str(self.nuevosDatos[index]) + '\n'

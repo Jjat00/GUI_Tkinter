@@ -1,5 +1,5 @@
 """
-@Author:
+@author: Jhon_Tutalcha
 """
 
 import os
@@ -10,6 +10,9 @@ from controller import Controller
 import matplotlib.pyplot as plt
 
 class MainGUI(tk.Tk):
+    """ 
+    Interfaz gráfica principal
+    """
     def __init__(self):
         super().__init__()
         self.relativePath = os.getcwd()
@@ -18,6 +21,9 @@ class MainGUI(tk.Tk):
         self.crearWidgets()
 
     def crearWidgets(self):
+        """ 
+        Pone todos los elementos gráficos en la interfaz
+        """
         labelTitulo = tk.Label(
             text="Demanda Colombia", fg="blue", font=("arial bold", 20))
         labelTitulo.pack()
@@ -41,6 +47,12 @@ class MainGUI(tk.Tk):
         botonGuardarDatos.grid(row=0, column=3, padx=10, pady=5)
 
     def graficar(self, figura): 
+        """
+        Pone en la interfaz gráfica una figura de matplotlib
+
+        parameters: figura de matplotlib 
+        """
+
         for widget in self.frameGrafica.winfo_children():
             widget.destroy()
         canvas = FigureCanvasTkAgg(figura, master=self.frameGrafica)
@@ -48,7 +60,11 @@ class MainGUI(tk.Tk):
         canvas.get_tk_widget().pack(anchor="center")
       
     def cargarCarpeta(self):
-        # opciones de busqueda
+        """
+        Abre un cuadro de dialogo para selccionar el directorio en donde 
+        se encuentran los archivos .csv
+        """
+        
         opcionesDirectorio = {
             'initialdir': self.relativePath,
             'mustexist': False,
@@ -63,8 +79,9 @@ class MainGUI(tk.Tk):
 
     def cargarArchivo(self):
         """
-        permite selecionar un archivo con las opciones de busqueda
+        Abre un cuado de dialogo para selecionar un archivo con las opciones de busqueda
         """
+
         opcionesArchivo = {
             'defaultextension': "*.csv",
             'filetypes': [("files csv", "*.csv"), ('all files', '*.*')],
@@ -81,6 +98,10 @@ class MainGUI(tk.Tk):
             print('se debe seleccionar un archivo')
         
     def guardarDatos(self):
+        """
+        Abre un dialogo para seleccionar la ruta en donde se guardarán los archivos
+        """
+
         opcionesArchivo = {
             'defaultextension': "*.csv",
             'filetypes': [("files csv", "*.csv"), ('all files', '*.*')],
@@ -97,6 +118,9 @@ class MainGUI(tk.Tk):
             print('se debe seleccionar una ruta')
 
     def seleccionarItervalo(self):
+        """
+        Configura el intervalo de visualización de los datos al cargar un archivo .csv
+        """
         minDia = 5
         maxDia = 10
         return minDia, maxDia
@@ -104,7 +128,7 @@ class MainGUI(tk.Tk):
 
 if __name__ == "__main__":
     root = MainGUI()
-    root.title("Demanda Colombia")  # Título de la ventana
-    root.geometry("1100x600")  # tamaño de la ventana
+    root.title("Demanda Colombia")  
+    root.geometry("1100x600")  
     root.mainloop()
 
