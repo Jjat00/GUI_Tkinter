@@ -185,13 +185,12 @@ class Controller():
         # crear figura
         fig = plt.Figure(figsize=(11, 5), dpi=100)
         # máximo valor
-        fig.add_subplot().plot(
-            fechaMaxValor, maxValor, 'o', c='r')
+        ax = fig.add_subplot()
+        ax.plot(fechaMaxValor, maxValor, 'o', c='r')
         # gráfica del mes que tiene el máximo valor
-        fig.add_subplot().plot(
-            datosDemanda['fecha'], datosDemanda['valorDemanda'])
-        fig.add_subplot().set_title(nombreArchivo + '\n' + mensaje)
-
+        ax.plot(datosDemanda['fecha'], datosDemanda['valorDemanda'])
+        ax.set_title(nombreArchivo + '\n' + mensaje)
+        #plt.show()
         return fig
 
     def cargarArchivo(self, pathArchivo):
@@ -204,7 +203,8 @@ class Controller():
         """
         self.datosArchivo = self.cargarDatosArchivo(pathArchivo)
         valoresDemanda = self.datosArchivo['valorDemanda']
-        diasMes = int(len(valoresDemanda) / 24)
+        maxDiasMes = int(len(valoresDemanda) / 24)
+        return maxDiasMes
 
     def setIntervalo(self, min, max):
         """
@@ -227,7 +227,7 @@ class Controller():
 
         self.nuevasFechas = self.datosArchivo['fecha'][min * 24 : max * 24]
         self.nuevosDatos = self.datosArchivo['valorDemanda'][min * 24 : max * 24]
-        nombreArchivo = 'mes_%i_dia_%i_al%i.txt' % (
+        nombreArchivo = 'mes_%i_dia_%i_al_%i.txt' % (
             self.nuevasFechas[0].month, min, max)
         # crear figura
         fig = plt.Figure(figsize=(10, 5), dpi=100)

@@ -9,29 +9,55 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from controller import Controller
 import matplotlib.pyplot as plt
 
-class MainGUI(tk.Tk):
+class MainGUI():
     """ 
     Interfaz gráfica principal
     """
     def __init__(self):
         super().__init__()
+        window = tk.Tk()
+        window.title("Demanda Colombia")  
+        window.geometry("1100x600")  
+
         self.relativePath = os.getcwd()
         self.controller = Controller()
         self.mensaje = None
-        self.crearWidgets()
+        self.crearWidgets(window)
+        window.mainloop()
 
-    def crearWidgets(self):
+    def crearWidgets(self, window):
         """ 
         Pone todos los elementos gráficos en la interfaz
         """
-        labelTitulo = tk.Label(
+        labelTitulo = tk.Label(window, 
             text="Demanda Colombia", fg="blue", font=("arial bold", 20))
         labelTitulo.pack()
 
-        self.frameBotones = tk.Frame(self, bg='cornsilk3')
+        self.frameBotones = tk.Frame(window, bg='cornsilk3')
         self.frameBotones.pack()
 
-        self.frameGrafica = tk.Frame(self, bg='cyan2')
+        # configuración intervalo de días
+        self.frameConfig = tk.Frame(window, bg='cyan2')
+        self.frameConfig.pack()
+        #self.seleccionarItervalo()
+
+        labelminIntervalo = tk.Label(self.frameConfig, 
+            text="min intervalo:", fg="black", font=("arial bold", 10))
+        labelminIntervalo.pack()
+        
+        self.minIntervalo = tk.Entry(self.frameConfig)
+        self.minIntervalo.insert(0, 1)
+        self.minIntervalo.pack()
+
+        labelmaxIntervalo = tk.Label(self.frameConfig, 
+            text="max intervalo:", fg="black", font=("arial bold", 10))
+        labelmaxIntervalo.pack()
+
+        self.maxIntervalo = tk.Entry(self.frameConfig)
+        self.maxIntervalo.insert(0, 30)
+        self.maxIntervalo.pack()
+
+        self.frameGrafica = tk.Frame(window, bg='cyan2')
         self.frameGrafica.pack()
 
         botonCargarCarpeta = tk.Button(
@@ -45,6 +71,8 @@ class MainGUI(tk.Tk):
         botonGuardarDatos = tk.Button(
             self.frameBotones, text="Guardar datos", command=self.guardarDatos, fg="blue", bg="white", width=15)
         botonGuardarDatos.grid(row=0, column=3, padx=10, pady=5)
+
+        
 
     def graficar(self, figura): 
         """
@@ -90,10 +118,14 @@ class MainGUI(tk.Tk):
         }
         try:
             pathArchivo = filedialog.askopenfilename(**opcionesArchivo)
-            self.controller.cargarArchivo(pathArchivo)
+            maxDiasMes = self.controller.cargarArchivo(pathArchivo)
             minDia, maxDia = self.seleccionarItervalo()
-            figura, self.nombreArchivo = self.controller.setIntervalo(minDia, maxDia)
-            self.graficar(figura)
+            if minDia < 0 or maxDia >= maxDiasMes:
+                tk.messagebox.showinfo(message="El intervalo debe ser mayor que 1 y menor que " + str(maxDiasMes)
+                , title="Advertencia")
+            else:
+                figura, self.nombreArchivo = self.controller.setIntervalo(minDia, maxDia)
+                self.graficar(figura)
         except:
             print('se debe seleccionar un archivo')
         
@@ -121,14 +153,11 @@ class MainGUI(tk.Tk):
         """
         Configura el intervalo de visualización de los datos al cargar un archivo .csv
         """
-        minDia = 5
-        maxDia = 10
+        minDia = int(self.minIntervalo.get())-1
+        maxDia = int(self.maxIntervalo.get())-1
         return minDia, maxDia
         
 
 if __name__ == "__main__":
-    root = MainGUI()
-    root.title("Demanda Colombia")  
-    root.geometry("1100x600")  
-    root.mainloop()
-
+    MainGUI()
+    
